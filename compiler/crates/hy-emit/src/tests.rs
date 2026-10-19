@@ -2908,3 +2908,15 @@ fn m4_initialism_mapping_for_foreign_go_names_issue_658() {
     assert!(go.contains("strings.ToValidUTF8(\"a\", \"b\")"), "expected strings.ToValidUTF8, got:\n{}", go);
 }
 
+#[test]
+fn rune_literals_emit_valid_go_escapes() {
+    let go = emit(
+        "fn main() {\n    _ = '\\u{0}'\n    _ = '\\u{7}'\n    _ = '\\u{1b}'\n    _ = 'a'\n    _ = '\\u{10ffff}'\n}\n",
+    );
+    assert!(go.contains(r"'\U00000000'"), "got:\n{}", go);
+    assert!(go.contains(r"'\U00000007'"), "got:\n{}", go);
+    assert!(go.contains(r"'\U0000001b'"), "got:\n{}", go);
+    assert!(go.contains(r"'\U00000061'"), "got:\n{}", go);
+    assert!(go.contains(r"'\U0010ffff'"), "got:\n{}", go);
+}
+
